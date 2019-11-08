@@ -1,11 +1,13 @@
 package com.myfinancial.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
 
 @Data
 @Entity
+@Builder
 public class User {
 
     @Id
@@ -13,11 +15,11 @@ public class User {
     private Long id;
 
     @Column
-    private String nome;
+    private String name;
 
     @Column
     private String email;
 
     @Column
-    private String senha;
+    private String password;
 }

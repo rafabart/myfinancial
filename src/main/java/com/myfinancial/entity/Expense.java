@@ -1,5 +1,8 @@
 package com.myfinancial.entity;
 
+import com.myfinancial.entity.enums.StatusExpense;
+import com.myfinancial.entity.enums.TypeExpense;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
@@ -9,6 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
+@Builder
 public class Expense {
 
     @Id
@@ -16,19 +20,27 @@ public class Expense {
     private Long id;
 
     @Column
-    private Integer mes;
+    private Integer month;
 
     @Column
-    private Integer ano;
+    private Integer year;
 
     @ManyToOne
     @JoinColumn
     private User user;
 
     @Column
-    private BigDecimal valor;
+    private BigDecimal value;
 
     @Column
     @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
-    private LocalDate dataCadastro;
+    private LocalDate dateRegister;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private TypeExpense typeExpense;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private StatusExpense statusExpense;
 }
