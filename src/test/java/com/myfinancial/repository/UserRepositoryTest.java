@@ -6,10 +6,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
+@ActiveProfiles("test")
 public class UserRepositoryTest {
 
     @Autowired
@@ -28,5 +30,17 @@ public class UserRepositoryTest {
 
         //Verificação
         Assertions.assertThat(result).isTrue();
+    }
+
+    @Test
+    public void returnFalseIfEmailNotExist(){
+        //Cenário
+        userRepository.deleteAll();
+
+        //Ação e execução
+        boolean result = userRepository.existsByEmail("usuario@email.com");
+
+        //Verificação
+        Assertions.assertThat(result).isFalse();
     }
 }

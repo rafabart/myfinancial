@@ -2,8 +2,10 @@ package com.myfinancial.entity;
 
 import com.myfinancial.entity.enums.StatusExpense;
 import com.myfinancial.entity.enums.TypeExpense;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import javax.persistence.*;
@@ -13,6 +15,8 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Expense {
 
     @Id
