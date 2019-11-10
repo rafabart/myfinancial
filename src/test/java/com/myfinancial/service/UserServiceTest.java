@@ -3,39 +3,47 @@ package com.myfinancial.service;
 import com.myfinancial.entity.User;
 import com.myfinancial.exception.UserEmailException;
 import com.myfinancial.repository.UserRepository;
+import com.myfinancial.service.Impl.UserServiceImpl;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@SpringBootTest
+
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 public class UserServiceTest {
 
-    @Autowired
     private UserService userService;
 
-    @Autowired
+    @MockBean
     private UserRepository userRepository;
 
+    @Before
+    public void setUp() {
+        userService = new UserServiceImpl(userRepository);
+    }
 
+
+    //expected = UserEmailException.class -> Valida o método se não ocorrer uma excessão.
     @Test(expected = Test.None.class)
     public void mustValidateEmail() {
         //Cenário
-        userRepository.deleteAll();
+        Mockito.when(userRepository.existsByEmail(Mockito.anyString())).thenReturn(false);
 
         //Ação
         userService.validateEmail("email@email.com");
     }
 
+
+    //expected = UserEmailException.class - > Valida o método se ocorrer uma excessão do tipo UserEmailException.
     @Test(expected = UserEmailException.class)
     public void mustThrowExceptionWhenTryToValidateEmailThatAlreadyExists() {
         //Cenário
-        User user = User.builder().name("usuario").email("usuario@email.com").build();
-        userRepository.save(user);
+        Mockito.when(userRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
 
         //Ação
         userService.validateEmail("usuario@email.com");
