@@ -2,7 +2,7 @@ package com.myfinancial.service;
 
 import com.myfinancial.entity.User;
 import com.myfinancial.exception.AuthenticationException;
-import com.myfinancial.exception.UserEmailException;
+import com.myfinancial.exception.BusinessRuleException;
 import com.myfinancial.repository.UserRepository;
 import com.myfinancial.service.Impl.UserServiceImpl;
 import org.assertj.core.api.Assertions;
@@ -42,7 +42,7 @@ public class UserServiceTest {
 
 
     //expected = UserEmailException.class - > Valida o método se ocorrer uma excessão do tipo UserEmailException.
-    @Test(expected = UserEmailException.class)
+    @Test(expected = BusinessRuleException.class)
     public void mustThrowExceptionWhenTryToValidateEmailThatAlreadyExists() {
         //Cenário
         Mockito.when(userRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
@@ -117,11 +117,11 @@ public class UserServiceTest {
         Assertions.assertThat(userSaved.getPassword()).isEqualTo("senha");
     }
 
-    @Test(expected = UserEmailException.class)
+    @Test(expected = BusinessRuleException.class)
     public void mustNotSaveUserWithExistingEmail() {
 
         final String email = "email@email.com";
-        Mockito.doThrow(UserEmailException.class).when(userServiceImpl).validateEmail(email);
+        Mockito.doThrow(BusinessRuleException.class).when(userServiceImpl).validateEmail(email);
 
         User user = User.builder().email("email@email.com").build();
 

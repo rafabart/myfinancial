@@ -24,6 +24,9 @@ public class Expense {
     private Long id;
 
     @Column
+    private String description;
+
+    @Column
     private Integer month;
 
     @Column

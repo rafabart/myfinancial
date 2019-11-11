@@ -2,7 +2,7 @@ package com.myfinancial.service.Impl;
 
 import com.myfinancial.entity.User;
 import com.myfinancial.exception.AuthenticationException;
-import com.myfinancial.exception.UserEmailException;
+import com.myfinancial.exception.BusinessRuleException;
 import com.myfinancial.repository.UserRepository;
 import com.myfinancial.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if (!userOptional.isPresent()) {
+        if (userOptional.isEmpty()) {
             throw new AuthenticationException("Usuário não encontrado para o email informado!");
         }
 
@@ -49,7 +49,13 @@ public class UserServiceImpl implements UserService {
 
     public void validateEmail(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new UserEmailException("Já existe um usuário cadastro com este email!");
+            throw new BusinessRuleException("Já existe um usuário cadastro com este email!");
         }
+    }
+
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 }

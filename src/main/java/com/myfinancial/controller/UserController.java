@@ -2,7 +2,8 @@ package com.myfinancial.controller;
 
 import com.myfinancial.dto.UserDTO;
 import com.myfinancial.entity.User;
-import com.myfinancial.exception.UserEmailException;
+import com.myfinancial.exception.AuthenticationException;
+import com.myfinancial.exception.BusinessRuleException;
 import com.myfinancial.service.Impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,17 @@ public class UserController {
     }
 
 
+    @PostMapping("/authentication")
+    public ResponseEntity authentication(@RequestBody UserDTO userDTO) {
+        try {
+            final User authenticateUser = userServiceImpl.authenticate(userDTO.getEmail(), userDTO.getPassword());
+            return ResponseEntity.ok(authenticateUser);
+        } catch (AuthenticationException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
     @PostMapping
     public ResponseEntity save(@RequestBody UserDTO userDTO) {
 
@@ -32,7 +44,7 @@ public class UserController {
         try {
             User saveUser = userServiceImpl.saveUser(user);
             return new ResponseEntity(saveUser, HttpStatus.CREATED);
-        } catch (UserEmailException e) {
+        } catch (BusinessRuleException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
