@@ -9,12 +9,16 @@ import com.myfinancial.exception.BusinessRuleException;
 import com.myfinancial.service.Impl.ExpenseServiceImpl;
 import com.myfinancial.service.Impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+//@RequiredArgsConstructor -> Cria um contrutor automaticamente para a classe com os atributos declarados como 'final'
 @RestController
 @RequestMapping("/api/expenses")
 public class ExpenseController {
@@ -31,7 +35,73 @@ public class ExpenseController {
 
     @PostMapping
     public ResponseEntity save(@RequestBody ExpenseDTO expenseDTO) {
-        return null;
+
+        try {
+            expenseDTO.setStatusExpense("PENDENTE");
+            Expense expense = converter(expenseDTO);
+            expense = expenseServiceImpl.saveExpense(expense);
+            return new ResponseEntity(expense, HttpStatus.CREATED);
+
+        } catch (BusinessRuleException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @PutMapping("{id}")
+    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody ExpenseDTO expenseDTO) {
+
+        return expenseServiceImpl.findById(id).map(entity -> {
+            try {
+                Expense expense = converter(expenseDTO);
+                expense.setId(entity.getId());
+                expenseServiceImpl.updateExpense(expense);
+                return ResponseEntity.ok(expense);
+
+            } catch (BusinessRuleException e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+        }).orElseGet(() ->
+                new ResponseEntity("Lançamento não encontrado na base de dados!", HttpStatus.BAD_REQUEST));
+    }
+
+
+    @DeleteMapping("{id}")
+    public ResponseEntity delete(@PathVariable("id") Long id) {
+        return expenseServiceImpl.findById(id).map(entity -> {
+            expenseServiceImpl.deleteExpense(entity);
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }).orElseGet(() ->
+                new ResponseEntity("Lançamento não encontrado na base de dados!", HttpStatus.BAD_REQUEST));
+    }
+
+
+    @GetMapping
+    public ResponseEntity find(
+            //Outra opção seria usa 'Map', mas isso torna os valores obrigatórios.
+            //@RequestParam java.util.Map<String, String> params
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "month", required = false) Integer month,
+            @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "value", required = false) BigDecimal value,
+            @RequestParam("userId") Long userId
+    ) {
+        Expense expenseFilter = new Expense();
+        expenseFilter.setDescription(description);
+        expenseFilter.setMonth(month);
+        expenseFilter.setYear(year);
+        expenseFilter.setValue(value);
+
+        Optional<User> userOptional = userServiceImpl.findById(userId);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("Não foi possível realizar a consulta. Usuário não encontrado para o Id informado!");
+        } else {
+            expenseFilter.setUser(userOptional.get());
+        }
+
+        List<Expense> expenseList = expenseServiceImpl.find(expenseFilter);
+        return ResponseEntity.ok(expenseList);
     }
 
 
@@ -46,13 +116,16 @@ public class ExpenseController {
         expense.setValue(expenseDTO.getValue());
 
         final User user = userServiceImpl
-                .findById(expenseDTO.getId())
+                .findById(expenseDTO.getUserId())
                 .orElseThrow(() -> new BusinessRuleException("Usuário não encontrado para o Id informado!"));
 
         expense.setUser(user);
-        expense.setTypeExpense(TypeExpense.valueOf(expenseDTO.getTypeExpense()));
-        expense.setStatusExpense(StatusExpense.valueOf(expenseDTO.getStatusExpense()));
-
+        if (expenseDTO.getTypeExpense() != null) {
+            expense.setTypeExpense(TypeExpense.valueOf(expenseDTO.getTypeExpense()));
+        }
+        if (expenseDTO.getStatusExpense() != null) {
+            expense.setStatusExpense(StatusExpense.valueOf(expenseDTO.getStatusExpense()));
+        }
         return expense;
     }
 }

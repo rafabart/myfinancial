@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
@@ -23,6 +24,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     public ExpenseServiceImpl(ExpenseRepository expenseRepository) {
         this.expenseRepository = expenseRepository;
+    }
+
+
+    @Override
+    public Optional<Expense> findById(Long id) {
+        return expenseRepository.findById(id);
     }
 
 

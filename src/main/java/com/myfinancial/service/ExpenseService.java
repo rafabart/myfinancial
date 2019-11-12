@@ -4,6 +4,7 @@ import com.myfinancial.entity.Expense;
 import com.myfinancial.entity.enums.StatusExpense;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ExpenseService {
 
@@ -18,4 +19,6 @@ public interface ExpenseService {
     void updateStatus(Expense expense, StatusExpense statusExpense);
 
     void validateExpense(Expense expense);
+
+    Optional<Expense> findById(Long id);
 }
