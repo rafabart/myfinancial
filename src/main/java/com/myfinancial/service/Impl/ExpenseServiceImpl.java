@@ -61,12 +61,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List find(Expense expenseFilter) {
+    public List<Expense> find(Expense expenseFilter) {
 
         //Pega os atributos preenchidos do objeto expenseRepository para configurar uma busca personalizada.
         //withIgnoreCase() -> Ignora maiusculas e minusculas.
         //StringMatcher.CONTAINING -> Contendo o conteudo da busca em qualquer lugar da string.
-        Example example = Example.of(expenseRepository,
+        Example example = Example.of(expenseFilter,
                 ExampleMatcher.matching()
                         .withIgnoreCase()
                         .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
