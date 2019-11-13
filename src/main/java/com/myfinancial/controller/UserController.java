@@ -4,21 +4,27 @@ import com.myfinancial.dto.UserDTO;
 import com.myfinancial.entity.User;
 import com.myfinancial.exception.AuthenticationException;
 import com.myfinancial.exception.BusinessRuleException;
+import com.myfinancial.service.Impl.ExpenseServiceImpl;
 import com.myfinancial.service.Impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("api/users")
 public class UserController {
 
     private final UserServiceImpl userServiceImpl;
+    private final ExpenseServiceImpl expenseServiceImpl;
 
     @Autowired
-    public UserController(UserServiceImpl userServiceImpl) {
+    public UserController(UserServiceImpl userServiceImpl, ExpenseServiceImpl expenseServiceImpl) {
         this.userServiceImpl = userServiceImpl;
+        this.expenseServiceImpl = expenseServiceImpl;
     }
 
 
@@ -48,4 +54,17 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("{id}/balance")
+    public ResponseEntity getBalanceByUser(@PathVariable("id") Long id) {
+
+        Optional<User> userOptional = userServiceImpl.findById(id);
+        if (userOptional.isEmpty()) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        BigDecimal balance = expenseServiceImpl.getBalanceByUser(id);
+        return ResponseEntity.ok(balance);
+    }
+
 }

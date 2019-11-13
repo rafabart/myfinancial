@@ -3,6 +3,7 @@ package com.myfinancial.service;
 import com.myfinancial.entity.Expense;
 import com.myfinancial.entity.enums.StatusExpense;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +22,6 @@ public interface ExpenseService {
     void validateExpense(Expense expense);
 
     Optional<Expense> findById(Long id);
+
+    BigDecimal getBalanceByUser(Long idUser);
 }

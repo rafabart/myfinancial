@@ -2,6 +2,7 @@ package com.myfinancial.service.Impl;
 
 import com.myfinancial.entity.Expense;
 import com.myfinancial.entity.enums.StatusExpense;
+import com.myfinancial.entity.enums.TypeExpense;
 import com.myfinancial.exception.BusinessRuleException;
 import com.myfinancial.repository.ExpenseRepository;
 import com.myfinancial.service.ExpenseService;
@@ -30,6 +31,24 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public Optional<Expense> findById(Long id) {
         return expenseRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal getBalanceByUser(Long idUser) {
+
+        BigDecimal incomes = expenseRepository.getBalanceByUser(idUser, TypeExpense.RECEITA);
+        BigDecimal expenses = expenseRepository.getBalanceByUser(idUser, TypeExpense.DESPESA);
+
+        if (incomes == null) {
+            incomes = BigDecimal.ZERO;
+        }
+
+        if (expenses == null) {
+            expenses = BigDecimal.ZERO;
+        }
+
+        return incomes.subtract(expenses);
     }
 
 

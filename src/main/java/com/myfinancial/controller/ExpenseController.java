@@ -1,6 +1,7 @@
 package com.myfinancial.controller;
 
 import com.myfinancial.dto.ExpenseDTO;
+import com.myfinancial.dto.StatusExpenseDTO;
 import com.myfinancial.entity.Expense;
 import com.myfinancial.entity.User;
 import com.myfinancial.entity.enums.StatusExpense;
@@ -71,6 +72,28 @@ public class ExpenseController {
         return expenseServiceImpl.findById(id).map(entity -> {
             expenseServiceImpl.deleteExpense(entity);
             return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }).orElseGet(() ->
+                new ResponseEntity("Lançamento não encontrado na base de dados!", HttpStatus.BAD_REQUEST));
+    }
+
+
+    @PutMapping("{id}/updateStatusExpense")
+    public ResponseEntity updateStatusExpense(@PathVariable("id") Long id, @RequestBody StatusExpenseDTO statusExpenseDTO) {
+
+        return expenseServiceImpl.findById(id).map(entity -> {
+            StatusExpense statusExpense = StatusExpense.valueOf(statusExpenseDTO.getStatus());
+
+            if (statusExpense == null) {
+                return ResponseEntity.badRequest().body("Não foi possível atualizar o status do lançamento, envie um status válido!");
+            }
+
+            try {
+                entity.setStatusExpense(statusExpense);
+                expenseServiceImpl.updateExpense(entity);
+                return ResponseEntity.ok(entity);
+            } catch (BusinessRuleException e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
         }).orElseGet(() ->
                 new ResponseEntity("Lançamento não encontrado na base de dados!", HttpStatus.BAD_REQUEST));
     }
