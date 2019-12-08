@@ -98,6 +98,12 @@ public class ExpenseController {
                 new ResponseEntity("Lançamento não encontrado na base de dados!", HttpStatus.BAD_REQUEST));
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity findById(@PathVariable("id") Long id) {
+        return expenseServiceImpl.findById(id).map(expense -> new ResponseEntity(converter(expense), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity(HttpStatus.NOT_FOUND));
+    }
+
 
     @GetMapping
     public ResponseEntity find(
@@ -125,6 +131,19 @@ public class ExpenseController {
 
         List<Expense> expenseList = expenseServiceImpl.find(expenseFilter);
         return ResponseEntity.ok(expenseList);
+    }
+
+    private ExpenseDTO converter(Expense expense) {
+        return ExpenseDTO.builder()
+                .id(expense.getId())
+                .description(expense.getDescription())
+                .value(expense.getValue())
+                .month(expense.getMonth())
+                .year(expense.getYear())
+                .statusExpense(expense.getStatusExpense().name())
+                .typeExpense(expense.getTypeExpense().toString())
+                .userId(expense.getUser().getId())
+                .build();
     }
 
 

@@ -37,8 +37,8 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Transactional(readOnly = true)
     public BigDecimal getBalanceByUser(Long idUser) {
 
-        BigDecimal incomes = expenseRepository.getBalanceByUser(idUser, TypeExpense.RECEITA);
-        BigDecimal expenses = expenseRepository.getBalanceByUser(idUser, TypeExpense.DESPESA);
+        BigDecimal incomes = expenseRepository.getBalanceByUserAndStatusAndTypeExpense(idUser, TypeExpense.RECEITA,StatusExpense.EFETIVADO);
+        BigDecimal expenses = expenseRepository.getBalanceByUserAndStatusAndTypeExpense(idUser, TypeExpense.DESPESA,StatusExpense.EFETIVADO);
 
         if (incomes == null) {
             incomes = BigDecimal.ZERO;
